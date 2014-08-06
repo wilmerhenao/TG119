@@ -15,7 +15,7 @@ class fmo_data(object):
         self.structs = [fmo_struct(structures[0,b][0]) for b in range(self.nStruct)]
         dHolder = []
         for b in range(self.nBeams):
-            beamDFile = io.loadmat(self.dataFolder + 'Gantry' + str(self.gantry[b])+'_Couch' + str(self.couch[b]) + '_Dnew.mat')
+            beamDFile = io.loadmat('../Data/' + 'Gantry' + str(self.gantry[b])+'_Couch' + str(self.couch[b]) + '_Dnew.mat')
             dHolder.append(beamDFile['Dnew'])
         self.D = sps.hstack([dHolder[d] for d in range(len(dHolder))]).tocsc()
         self.printAllData()
@@ -44,13 +44,13 @@ class fmo_model(object):
         self.m = Model('FMO')
 
         print('generating z variables')
-        self.z = [self.m.addVar(lb=-GRB.INFINITY, vtype=GRB.CONTINUOUS) for i in xrange(data.nVox)]
+        self.z = [self.m.addVar(lb=-GRB.INFINITY, vtype=GRB.CONTINUOUS) for i in range(data.nVox)]
         self.x = []
         self.m.update()
 
 
         print('initializing dose constraint')
-        self.doseConstr = [self.m.addConstr(-self.z[j],GRB.EQUAL,0) for j in xrange(data.nVox)]
+        self.doseConstr = [self.m.addConstr(-self.z[j],GRB.EQUAL,0) for j in range(data.nVox)]
         self.m.update()
 
         print( 'generating x variables and populating dose constraint')
@@ -103,7 +103,7 @@ class fmo_model(object):
         #This saves the apertures to a matlab cell array
         io.savemat(outName,{'x':[self.x[i].X for i in range(len(self.x)) ],'subdose':[self.z[j].X for j in range(len(self.z))]})
 
-data = fmo_data('tg119pythondata.mat')
+data = fmo_data('../Data/tg119pythondata.mat')
 
 model = fmo_model(data)
 
